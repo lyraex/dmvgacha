@@ -1,16 +1,12 @@
+Object = require "classic"
+require "autobatch"
+json = require "json"
+lume = require "lume"
+log = require "log"
+
+
 function roll(cardSet)
-    pulls=0
-    probabilityTable={}
-    for i, rarity in ipairs(cardSet[1]) do
-        probability = cardSet[2][i]
-        for k=1, probability do
-            table.insert(probabilityTable, rarity) -- Build the probability table (100 elements, one per percent)
-        end
-    end
-    pull={}
-    math.randomseed(os.time()) -- set a random seed for math.random, math.random produces the same value over and over if you don't
-    table.insert(pull, probabilityTable[math.random(#probabilityTable)]) -- get a random element from available pulls and adds it to pulls list
-    
+    pull=lume.weightedchoice({ [cardSet[1]]=5, [cardSet[2]]=45, [cardSet[3]]=50 })
 end
 
 function love.load()
@@ -19,10 +15,8 @@ function love.load()
     R=love.graphics.newImage('vex.jpg')
     N=love.graphics.newImage('vexdawn.jpg')
 
-    --setting the cardset
-    cardSet = {{"SR","R","N"},
-        {5, 50, 45}
-    }
+    -- initially setting the cardset
+    cardSet={"SR","R","N"}
     roll(cardSet)
 end
 function love.keypressed(key)
@@ -30,12 +24,12 @@ function love.keypressed(key)
         roll(cardSet)
     end
 end
-function love.update()
-    
-
+function love.update()  
+    require("lovebird").update()
+    print(pull)
 end
 
 function love.draw()
-    love.graphics.draw(_G[pull[1]],0,100) -- _G is the way to reference the table of all variable names, super handy
+    love.graphics.draw(_G[pull],0,100) -- _G is the way to reference the table of all variable names, super handy
 end
 
